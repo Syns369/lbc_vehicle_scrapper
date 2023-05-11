@@ -11,6 +11,16 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
+
+def sort_write(filename, key):
+    with open("results/vehicle_list.json", "r") as json_file:
+        list = json.load(json_file)
+        list.sort(key=lambda x: x[key])
+    json_object = json.dumps(list, indent=4)
+    with open(f"results/{filename}.json", "w") as outfile:
+        outfile.write(json_object)
+
+
 options = Options()
 # # Adding argument to disable the AutomationControlled flag
 options.add_argument("--disable-blink-features=AutomationControlled")
@@ -57,9 +67,12 @@ for van in vanList:
     van["km"] = int(re.sub("[^0-9]", "", km.text))
     dist = pgeocode.GeoDistance("fr")
     van["distance"] = dist.query_postal_code("92220", van["zipcode"]).round(0)
-    print(van["km"])
-    print(van["distance"])
-    print(van["link"])
+    print(f"price: {van['price']} €")
+    print(f"km: {van['km']} km")
+    print(f"distance: {van['distance']} km")
+    print(f"link: {van['link']}")
+    print(f"zipcode: {van['zipcode']}")
+    print("------------------")
 
 driver.quit()
 
@@ -74,32 +87,13 @@ if not os.path.exists("results"):
 with open("results/vehicle_list.json", "w") as outfile:
     outfile.write(json_object)
 
-# -------------------------------------------------------
-
 # sort the vehicle_list.json by price
-with open("results/vehicle_list.json", "r") as json_file:
-    priceList = json.load(json_file)
-    priceList.sort(key=lambda x: x["price"])
-json_object = json.dumps(priceList, indent=4)
-with open("results/priceList.json", "w") as outfile:
-    outfile.write(json_object)
-
-# -------------------------------------------------------
+sort_write("priceList", "price")
 
 # sort the vehicle_list.json by km
-with open("results/vehicle_list.json", "r") as json_file:
-    kmList = json.load(json_file)
-    kmList.sort(key=lambda x: x["km"])
-json_object = json.dumps(kmList, indent=4)
-with open("results/kmList.json", "w") as outfile:
-    outfile.write(json_object)
-
-# -------------------------------------------------------
+sort_write("kmList", "km")
 
 # sort the vehicle_list.json by distance
-with open("results/vehicle_list.json", "r") as json_file:
-    distList = json.load(json_file)
-    distList.sort(key=lambda x: x["distance"])
-json_object = json.dumps(distList, indent=4)
-with open("results/distList.json", "w") as outfile:
-    outfile.write(json_object)
+sort_write("distanceList", "distance")
+
+print(f"Done \U0001F44D")
