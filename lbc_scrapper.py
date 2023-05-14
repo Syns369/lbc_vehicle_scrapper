@@ -67,6 +67,7 @@ for van in vanList:
     van["km"] = int(re.sub("[^0-9]", "", km.text))
     dist = pgeocode.GeoDistance("fr")
     van["distance"] = dist.query_postal_code("92220", van["zipcode"]).round(0)
+    van["note"] = (van["price"] + van["km"] + van["distance"]) / 3
     print(f"price: {van['price']} €")
     print(f"km: {van['km']} km")
     print(f"distance: {van['distance']} km")
@@ -95,5 +96,8 @@ sort_write("kmList", "km")
 
 # sort the vehicle_list.json by distance
 sort_write("distanceList", "distance")
+
+# sort the vehicle_list.json by note
+sort_write("noteList", "note")
 
 print(f"Done \U0001F44D")
